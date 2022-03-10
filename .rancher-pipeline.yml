@@ -2,8 +2,12 @@ stages:
 - name: Build
   steps:
   - runScriptConfig:
-      image: java:8
+      image: alpine
       shellScript: |-
+        # 安装curl
+        sed -i 's/dl-cdn.alpinelinux.org/mirrors.ustc.edu.cn/g' /etc/apk/repositories
+        apk update && apk add curl && rm -rf /var/cache/apk/*
+        # 通知服务器更新
         curl -u "token-rb8r9:th9zk55bd6kpxm24xxfcdjn4h68fzhpvs62f2dnc4d2mcc5nqszdkl" \
         -X POST \
         -H 'Accept: application/json' \
