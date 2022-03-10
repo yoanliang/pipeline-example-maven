@@ -2,16 +2,12 @@ stages:
 - name: Build
   steps:
   - runScriptConfig:
-      image: maven:3-jdk-7
+      image: java:8
       shellScript: |-
-        mvn clean install
-- name: Publish
-  steps:
-  - publishImageConfig:
-      dockerfilePath: ./Dockerfile
-      buildContext: .
-      tag: example-greenhouse:${CICD_EXECUTION_SEQUENCE}
-- name: Deploy
-  steps:
-  - applyYamlConfig:
-      path: ./deployment.yaml
+        curl -u "token-rb8r9:th9zk55bd6kpxm24xxfcdjn4h68fzhpvs62f2dnc4d2mcc5nqszdkl" \
+        -X POST \
+        -H 'Accept: application/json' \
+        -H 'Content-Type: application/json' \
+        -d "{\"yaml\":\"apiVersion: apps/v1\nkind: Deployment\nmetadata:\n  name: engineering-admin-web\n  namespace: default\nspec:\n  replicas: 0\n  selector:\n    matchLabels:\n      app: engineering-admin-web\n  template:\n    metadata:\n      labels:\n        app: engineering-admin-web\n    spec:\n      containers:\n        - name: web\n          image: harbor.fwb.ct.gz/k8s/engineering-admin-web:v1.${CICD_EXECUTION_SEQUENCE}\n          imagePullPolicy: Always\n          securityContext:\n            privileged: true\n      dnsPolicy: ClusterFirst\n      imagePullSecrets:\n        - name: harbor\n      restartPolicy: Always\",\"defaultNamespace\":\"default\"}" \
+        'https://172.18.27.66/v3/clusters/c-5jkdq?action=importYaml' --insecure
+notification: {}
